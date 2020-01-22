@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.bridgelabz.spring.fundoo.user.dto.ForgetPasswordDto;
 import com.bridgelabz.spring.fundoo.user.dto.LoginDto;
 import com.bridgelabz.spring.fundoo.user.dto.RegistrationDto;
@@ -19,26 +18,29 @@ import com.bridgelabz.spring.fundoo.user.dto.SetPasswordDto;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.service.UserServiceImplemented;
 
+
 @RestController
-@RequestMapping(value ="/fundoo")
+@RequestMapping(value = "/fundoo")
 public class UserController {
 
 	@Autowired
 	UserServiceImplemented userserviceimplemented;
+	
+	//-----------------------------------------------------------------------------------------------//
 
 	@GetMapping("/user/demo")
 	public String demo() {
 		return "hello";
 	}
 
-	// ----------------------------------------------------------------------------------//
+	//-----------------------------------------------------------------------------------------------------//
 
 	// 1 -->for registering the user into the database.
 	@PostMapping("/user/register")
-	public ResponseEntity<Response> register( @Valid @RequestBody RegistrationDto registrationDto) {
+	public ResponseEntity<Response> register(@Valid @RequestBody RegistrationDto registrationDto) {
 
 		return new ResponseEntity<Response>(userserviceimplemented.registerUser(registrationDto), HttpStatus.OK); // give
-		
+
 	}
 
 	// ----------------------------------------------------------------------------------//
@@ -50,13 +52,14 @@ public class UserController {
 		return new ResponseEntity<Response>(userserviceimplemented.validateUser(token), HttpStatus.OK);
 	}
 
-	/* for validating the user into the database.
-	
-		  @GetMapping("/validate/{token}") public ResponseEntity<Response>
-		  validate(@PathVariable("token") String token) { System.out.println(token);
-		  return new
-		  ResponseEntity<Response>(userserviceimplemented.validateUser(token),
-		  HttpStatus.OK); }
+	/*
+	 * for validating the user into the database.
+	 * 
+	 * @GetMapping("/validate/{token}") public ResponseEntity<Response>
+	 * validate(@PathVariable("token") String token) { System.out.println(token);
+	 * return new
+	 * ResponseEntity<Response>(userserviceimplemented.validateUser(token),
+	 * HttpStatus.OK); }
 	 */
 
 	// ----------------------------------------------------------------------------------//
@@ -69,7 +72,7 @@ public class UserController {
 
 	}
 
-	// ----------------------------------------------------------------------------------//
+	// ---------------------------------------------------------------------------------------------//
 
 	// 4--->for forget password
 	@PostMapping("/user/forgotpassword")
@@ -80,6 +83,8 @@ public class UserController {
 		// return UserUtility.MAIL_SEND;
 		return new ResponseEntity<Response>(userserviceimplemented.forgetPassword(forgetPasswordDto), HttpStatus.OK);
 	}
+	
+	// --------------------------------------------------------------------------------------------//
 
 	// 5--->for resetting the password
 	@PostMapping("/user/resetpassword")
@@ -93,7 +98,7 @@ public class UserController {
 
 	// 6 ---> for finding a particular user.
 	@GetMapping("/user/finduser")
-	public ResponseEntity<Response> findBParticularUser(/*@RequestParam*/ @RequestHeader String token) {
+	public ResponseEntity<Response> findBParticularUser(/* @RequestParam */ @RequestHeader String token) {
 
 		return new ResponseEntity<Response>(userserviceimplemented.findBParticularUser(token), HttpStatus.OK);
 	}

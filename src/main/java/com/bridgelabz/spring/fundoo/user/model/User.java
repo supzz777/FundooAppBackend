@@ -2,18 +2,16 @@ package com.bridgelabz.spring.fundoo.user.model;
 
 import java.io.Serializable;
 import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import org.springframework.stereotype.Component;
-
 import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
+
 @Component /*
 			 * It uses the annotation to create a bean that randomly generates names. It
 			 * will be detected during component scan process
@@ -46,19 +44,19 @@ public class User implements Serializable {
 	private long phoneNumber;
 	@NotNull
 	private boolean validate;
-	
+
 	@OneToMany
-    private List<NoteModel> notes;
-	
-	/*@OneToMany
-    private List<LabelModel> labels;
-	*/
+	private List<NoteModel> notes;
+
+	/*
+	 * @OneToMany private List<LabelModel> labels;
+	 */
 
 	// Class constructor.
 	public User() {
 
 	}
-	
+
 	public User(int id, @NotNull String firstName, @NotNull String lastName, @NotNull String email,
 			@NotNull String password, @NotNull long phoneNumber, @NotNull boolean validate, List<NoteModel> notes) {
 		super();
@@ -71,8 +69,6 @@ public class User implements Serializable {
 		this.validate = validate;
 		this.notes = notes;
 	}
-
-
 
 	// Class constructor with feilds.
 	public User(int id, @NotNull String firstName, @NotNull String lastName, @NotNull String email,
@@ -94,6 +90,7 @@ public class User implements Serializable {
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public String getFirstName() {
 		return firstName;
 	}
@@ -141,15 +138,14 @@ public class User implements Serializable {
 	public void setValidate(boolean validate) {
 		this.validate = validate;
 	}
-	
+
 	public List<NoteModel> getNotes() {
 		return notes;
 	}
-	
+
 	public void setNotes(List<NoteModel> notes) {
 		this.notes = notes;
 	}
-
 
 	@Override
 	public String toString() {

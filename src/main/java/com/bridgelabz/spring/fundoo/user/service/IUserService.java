@@ -12,12 +12,16 @@ import com.bridgelabz.spring.fundoo.user.response.Response;
 public interface IUserService {
 
 	public Response registerUser(RegistrationDto regdto); // create addNewUser() method for add new user
-
+	
+	public Response validateUser(String token);
+	
 	public Response loginUser(LoginDto logindto); // create loginUser() method for login user
 
 	public Response forgetPassword(ForgetPasswordDto forgetPasswordDto);
 
 	public Response setPassword(SetPasswordDto setPasswordDto, String token);
+	
+	public String updateuser(User user, String email);
 	
 	public Response findBParticularUser(String token);
 	

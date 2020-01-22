@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.bridgelabz.spring.fundoo.user.model.User;
 
-@Repository //
+@Repository 
 public interface UserRepository extends JpaRepository<User, Object /*String*/> 
 {
 	/* Java 8 - Optional Class. Optional is a container object which may or may not contain a non-null value.

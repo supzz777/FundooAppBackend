@@ -23,36 +23,32 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Component
 @Entity
 @Table(name = "labelDetails")
-@JsonIgnoreProperties(value = {"user" })
-public class LabelModel implements Serializable
-{
-	
-	
+@JsonIgnoreProperties(value = { "user" })
+public class LabelModel implements Serializable {
+
 	private static final long serialVersionUID = 1L;
-	
-	@Id 
-	//@GeneratedValue(strategy = GenerationType.AUTO)
+
+	@Id
+	// @GeneratedValue(strategy = GenerationType.AUTO)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int labelId;
-	
+
 	@NotNull
 	private String labelName;
-	 
-	@ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
-	private User user;
-	
-	@ManyToMany
-	@JoinTable(
-			  name = "labeled_notes", 
-			  joinColumns = @JoinColumn(name = "label_id"))
-    List<NoteModel> notes;
-	
-	public LabelModel()
-	{
-		
-	}
 
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
+
+	@ManyToMany
+	@JoinTable(name = "labeled_notes", joinColumns = @JoinColumn(name = "label_id"))
+	List<NoteModel> notes;
+
+	public LabelModel() {
+
+	}
+	
+	//constructor using the feilds.
 	public LabelModel(int labelId, @NotNull String labelName, User user, List<NoteModel> notes) {
 		super();
 		this.labelId = labelId;
@@ -60,7 +56,8 @@ public class LabelModel implements Serializable
 		this.user = user;
 		this.notes = notes;
 	}
-
+	
+	//getters and setters
 	public int getLabelId() {
 		return labelId;
 	}
@@ -80,7 +77,7 @@ public class LabelModel implements Serializable
 	public User getUser() {
 		return user;
 	}
-
+	
 	public void setUser(User user) {
 		this.user = user;
 	}
@@ -92,15 +89,12 @@ public class LabelModel implements Serializable
 	public void setNotes(List<NoteModel> notes) {
 		this.notes = notes;
 	}
-
+	
+	//to String method.
 	@Override
 	public String toString() {
 		return "LabelModel [labelId=" + labelId + ", labelName=" + labelName + ", user=" + user + ", notes=" + notes
 				+ "]";
 	}
-
-	
-	
-	
 
 }

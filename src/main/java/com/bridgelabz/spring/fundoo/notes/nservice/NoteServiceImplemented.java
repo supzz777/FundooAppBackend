@@ -1,8 +1,5 @@
 package com.bridgelabz.spring.fundoo.notes.nservice;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,230 +20,207 @@ import com.bridgelabz.spring.fundoo.user.repository.UserRepository;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
 
-
 @Service
-public class NoteServiceImplemented implements INoteService
-{	
+public class NoteServiceImplemented implements INoteService {
 	@Autowired
 	private NoteRepository nrepository;
-	
+
 	@Autowired
 	private ModelMapper mapper;
-		
+
 	@Autowired
 	TokenUtility tokenUtility;
-	
+
 	@Autowired
 	private UserRepository repository;
+
+	// -----------------------------------------------------------------------------------------------//
 	
-	//-----------------------------------------------------------------------------------------------//
-	
+	//1 --> service implemented to create a note.
 	@Override
-	public Response createNote(@Valid NoteDto noteDto, String token )
-	{
+	public Response createNote(@Valid NoteDto noteDto, String token) {
+
+		NoteModel note = mapper.map(noteDto, NoteModel.class);
+		String useremail = tokenUtility.decodeToken(token);
 		
-		System.out.println("1");
+		User user = repository.findByEmail(useremail);
+	
+		if (user == null) {
+		
+			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
+		}
+		
+		note.setUser(user);
+		note = nrepository.save(note);
+		
+		return new Response(200, "note created", "saved successfully");
+	}
+
+	// -----------------------------------------------------------------------------------------------//
+	
+	
+	//2 --> service implemented to update a note.
+	@Override
+	public Response updateNote(@Valid int id, NoteDto noteDto, String token) 
+	{
 		NoteModel note =mapper.map(noteDto, NoteModel.class);
-		System.out.println("2");
-		String useremail = tokenUtility.decodeToken(token);
-		System.out.println("3");
-		User user = repository.findByEmail(useremail);
-		System.out.println("4");
-		if(user == null)
-		{
-			System.out.println("5");
-			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
-		}
-		
-		System.out.println("6");
-		note.setUser(user);
-		System.out.println("7");
-		 note = nrepository.save(note);
-		 System.out.println("8");
-		return new Response(200,"note created","saved successfully");
-	}
-	
-	//-----------------------------------------------------------------------------------------------//
 
-
-
-	@Override
-	public Response updateNote( @Valid int id ,  NoteDto noteDto, String token)
-	{
-		//NoteModel note =mapper.map(noteDto, NoteModel.class);
-		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
-		if(user == null)
-		{
+		if (user == null) {
 
 			System.out.println("error exception thrown.");
 			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
 		}
-		
-		
-		NoteModel noteupdate = nrepository.findById(id).
-				orElseThrow(() ->new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND)) ;
+
+		note = nrepository.findById(id)
+				.orElseThrow(() -> new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND));
 		/*
-		  //NoteModel noteupdate = nrepository.findById(id);
-		  
-		  if(noteupdate == null)
-		{
-			throw new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND);
-		}
-		*/
-		
-		//noteupdate.setUser(user); //not needed.
-		noteupdate.setTitle(noteDto.getTitle());
-		noteupdate.setDiscription(noteDto.getDiscription());
-		
-		nrepository.save(noteupdate);
-		
-		return new Response(200,"note updated","updated successfully");
-		
-	}
-	
-	
-	
-	
-	
-	
-	//-----------------------------------------------------------------------------------------------//
+		 * //NoteModel noteupdate = nrepository.findById(id);
+		 * 
+		 * if(noteupdate == null) { throw new
+		 * IdNotFoundException(NoteUtility.NOTE_NOT_FOUND); }
+		 */
 
+		// noteupdate.setUser(user); //not needed.
+		note.setTitle(noteDto.getTitle());
+		note.setDiscription(noteDto.getDiscription());
+
+		nrepository.save(note);
+
+		return new Response(200, "note updated", "updated successfully");
+
+	}
+
+	// -----------------------------------------------------------------------------------------------//
+	
+	//3 --> service implemented to delete a note.
 	@Override
-	public Response deleteNote(int id, String token) 
-	{
+	public Response deleteNote(int id, String token) {
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
-		
-		if(user == null)
-		{
+
+		if (user == null) {
 
 			System.out.println("error exception thrown.");
 			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
 		}
-		
-		NoteModel note = nrepository.findById(id).
-				orElseThrow(() ->new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND)) ;
 
-		//NoteModel note = nrepository.findById(id);
+		NoteModel note = nrepository.findById(id)
+				.orElseThrow(() -> new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND));
+
+		// NoteModel note = nrepository.findById(id);
 		note.setUser(user);
-		
+
 		nrepository.delete(note);
-		
-		return  new Response(200,"note deleted","deleted successfully");
-		
-		
+
+		return new Response(200, "note deleted", "deleted successfully");
+
 	}
-		
-	//-----------------------------------------------------------------------------------------------//
+
+	// -----------------------------------------------------------------------------------------------//
 	
+	//4 --> service implemented to show all the notes.
 	@Override
-	public List<NoteModel> showAllNotes(String token)
-	{	
+	public List<NoteModel> showAllNotes(String token) {
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
-		if(user == null)
-		{
+		if (user == null) {
 
 			System.out.println("error exception thrown.");
 			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
 		}
-		
-		List<NoteModel> note = nrepository.findAll().stream().filter(data-> data.getUser().getId() == user.getId()).collect(Collectors.toList());
-		
-		return note ; // show all user details in mysql.
-	}
-	
-	
-	//-----------------------------------------------------------------------------------------------//
 
-	public Object showAllNotesOfAllUserz() 
-	{
-		
-		List<NoteModel> note =nrepository.findAll().stream().collect(Collectors.toList());//show notes of all userz
+		List<NoteModel> note = nrepository.findAll().stream().filter(data -> data.getUser().getId() == user.getId())
+				.collect(Collectors.toList());
+
+		return note; // show all user details in mysql.
+	}
+
+	// -----------------------------------------------------------------------------------------------//
+	
+	//5 --> service implemented to show all the notes of a particular user.
+	@Override
+	public Object showAllNotesOfAllUserz() {
+
+		List<NoteModel> note = nrepository.findAll().stream().collect(Collectors.toList());// show notes of all userz
 
 		return note;
 	}
+
+	// -----------------------------------------------------------------------------------------------//
 	
-	//-----------------------------------------------------------------------------------------------//
-	
-	
+	//6 --> service implemented to sort all the notes by title.
 	@Override
-	public List<NoteModel> SortNotesByTitle(String token)
-	{	
+	public List<NoteModel> SortNotesByTitle(String token) {
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
-		if(user == null)
-		{
+		if (user == null) {
 
 			System.out.println("error exception thrown.");
 			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
 		}
-		
-		
-		List<NoteModel> note = nrepository.findAll().stream().filter(data-> data.getUser().getId()
-				== user.getId()).collect(Collectors.toList());
-		
-		note = note.stream().sorted((note1,note2)->note1.getTitle().compareTo(note2.getTitle())).collect(Collectors.toList());
-				
-		// Arrays.parallelSort(note);  
-	
-		
-		return note ; // show all user details in mysql.
+
+		List<NoteModel> note = nrepository.findAll().stream().filter(data -> data.getUser().getId() == user.getId())
+				.collect(Collectors.toList());
+
+		note = note.stream().sorted((note1, note2) -> note1.getTitle().compareTo(note2.getTitle()))
+				.collect(Collectors.toList());
+
+		// Arrays.parallelSort(note);
+
+		return note; // show all user details in mysql.
 	}
-	
-	
-	//------------------------------------------------------------------------------------------------------//
-	
-	
-		@Override
-		public List<NoteModel> sortByDescription(String token)
-		{
-			String useremail = tokenUtility.decodeToken(token);
-			User user = repository.findByEmail(useremail);
 
-			if(user == null)
-			{
+	// ------------------------------------------------------------------------------------------------------//
+	
+	//7 --> service implemented to sort all the notes by Description.
+	@Override
+	public List<NoteModel> sortByDescription(String token) {
+		String useremail = tokenUtility.decodeToken(token);
+		User user = repository.findByEmail(useremail);
 
-				System.out.println("error exception thrown.");
-				throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
-			}
-						
-			List<NoteModel> note = nrepository.findAll().stream().filter(data-> data.getUser().getId()
-					== user.getId()).collect(Collectors.toList());
-		
-			return note = note.stream().sorted((note1,note2)->note1.getDiscription().compareTo(note2.getDiscription() ) )
-					.collect(Collectors.toList());
+		if (user == null) {
 
+			System.out.println("error exception thrown.");
+			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
 		}
+
+		List<NoteModel> note = nrepository.findAll().stream().filter(data -> data.getUser().getId() == user.getId())
+				.collect(Collectors.toList());
+
+		return note = note.stream().sorted((note1, note2) -> note1.getDiscription().compareTo(note2.getDiscription()))
+				.collect(Collectors.toList());
+
+	}
+
+	// --------------------------------------------------------------------------------------------------------//
 	
-		//--------------------------------------------------------------------------------------------------------//
-		
-		
-			@Override
-			public List<NoteModel> sortByDate(String token)
-			{
-				String useremail = tokenUtility.decodeToken(token);
-				User user = repository.findByEmail(useremail);
+	//8 --> service implemented to sort all the notes by Date.
+	@Override
+	public List<NoteModel> sortByDate(String token) {
+		String useremail = tokenUtility.decodeToken(token);
+		User user = repository.findByEmail(useremail);
 
-				if(user == null)
-				{
+		if (user == null) {
 
-					System.out.println("error exception thrown.");
-					throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
-				}
-							
-				List<NoteModel> note = nrepository.findAll().stream().filter(data-> data.getUser().getId()
-						== user.getId()).collect(Collectors.toList());
-			
-				return note = note.stream().sorted((note1,note2)->note1.getNoteregistrationDate().compareTo(note2.getNoteregistrationDate() ) )
-						.collect(Collectors.toList());
+			System.out.println("error exception thrown.");
+			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
+		}
 
-			}
-			
-	//----------------------------------------------------------------------------------------------------------//		
+		List<NoteModel> note = nrepository.findAll().stream().filter(data -> data.getUser().getId() == user.getId())
+				.collect(Collectors.toList());
+
+		note = note.stream()
+				.sorted((note1, note2) -> note1.getNoteregistrationDate().compareTo(note2.getNoteregistrationDate()))
+				.collect(Collectors.toList());
+
+		return note;
+
+	}
+
+	// ----------------------------------------------------------------------------------------------------------//
 }

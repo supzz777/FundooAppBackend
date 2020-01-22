@@ -13,7 +13,6 @@ public interface INoteService
 	
 	public Response createNote(@Valid NoteDto noteDto , String token );
 	
-	//public Response updateNote( @Valid UpdateDto updateDto, String token);
 	public Response updateNote( @Valid int id , NoteDto notedto, String token);
 	
 	public Response deleteNote(int id, String token);

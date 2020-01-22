@@ -1,7 +1,5 @@
 package com.bridgelabz.spring.fundoo.user.utility;
 
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 

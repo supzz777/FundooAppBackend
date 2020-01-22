@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.spring.fundoo.label.ldto.LabelDto;
 import com.bridgelabz.spring.fundoo.label.lservice.LabelServiceImplemented;
-import com.bridgelabz.spring.fundoo.notes.ndto.NoteDto;
 import com.bridgelabz.spring.fundoo.user.response.Response;
+
 
 @RestController
 @RequestMapping(value ="/fundoo")
@@ -27,15 +27,18 @@ public class LabelController
 	@Autowired
 	LabelServiceImplemented labelServiceImplemented;
 	
-	@GetMapping("/demozz")
-	public String demoz()
-	{
-		return "hello supzz rock";
-	}
+	//---------------------------------------------------------------------------------------------//
+
+		@GetMapping("/demozz")
+		public String demoz()
+		{
+			return "hello supzz rock";
+		}
 	
 	
 	//---------------------------------------------------------------------------------------------//
-	
+		
+		//1 --> mapping for creating the label.
 		@PostMapping("/label/create")
 		public ResponseEntity<Response> createLabel( @Valid @RequestBody LabelDto labelDto ,@RequestHeader String token) 
 		{
@@ -46,7 +49,7 @@ public class LabelController
 		
 	//---------------------------------------------------------------------------------------------//	
 		
-		
+		//2 --> mapping for updating the label.
 		@PutMapping("/label/update/{id}")
 		public ResponseEntity<Response> updateLabel( @Valid @PathVariable("id") int id , @RequestBody LabelDto labelDto ,@RequestHeader String token) {
 		
@@ -58,7 +61,7 @@ public class LabelController
 		
 	//---------------------------------------------------------------------------------------------------------//
 		
-		
+		//3 --> mapping for deleting the label.
 		@DeleteMapping("/label/{id}")
 	    public HttpStatus deleteLabel(@PathVariable("id") int id , @RequestHeader String token) 
 	    {                                             
@@ -68,7 +71,8 @@ public class LabelController
 		
 		
 	//---------------------------------------------------------------------------------------------------------//
-
+		
+		//4 --> mapping to show all the labels present in the database..
 		@GetMapping("/label/showNotes")
 		public Response showAllLabels( @RequestHeader String token) {
 

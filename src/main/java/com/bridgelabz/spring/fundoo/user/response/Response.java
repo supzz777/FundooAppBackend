@@ -13,14 +13,16 @@ public class Response implements Serializable {
 	public Response() {
 
 	}
-
+	
+	//constructor with feilds.
 	public Response(int status, String message, Object data) {
 		super();
 		this.status = status;
 		this.message = message;
 		this.data = data;
 	}
-
+	
+	//getters and setters
 	public int getStatus() {
 		return status;
 	}
@@ -44,7 +46,9 @@ public class Response implements Serializable {
 	public void setData(Object data) {
 		this.data = data;
 	}
-
+	
+	
+	//to String method.
 	@Override
 	public String toString() {
 		return "Response [status=" + status + ", message=" + message + ", data=" + data + "]";
