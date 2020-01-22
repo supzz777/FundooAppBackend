@@ -24,7 +24,6 @@ import com.bridgelabz.spring.fundoo.label.lmodel.LabelModel;
 import com.bridgelabz.spring.fundoo.user.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-
 @Component /*
 			 * It uses the annotation to create a bean that randomly generates names. It
 			 * will be detected during component scan process
@@ -53,6 +52,7 @@ public class NoteModel implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
+	@JsonIgnoreProperties(value = { "user" }) 
 	private User user;
 
 	@ManyToMany(mappedBy = "notes")

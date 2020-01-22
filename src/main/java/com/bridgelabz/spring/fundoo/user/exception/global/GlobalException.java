@@ -14,7 +14,10 @@ import com.bridgelabz.spring.fundoo.user.utility.UserUtility;
 
 @ControllerAdvice /*@ControllerAdvice. @ControllerAdvice used for global error handling in the Spring MVC application.
 										It also has full control over the body of the response and the status code. */
-public class GlobalException {
+public class GlobalException 
+{
+	//----------------------------------------------------------------------------------------------//
+
 	@ExceptionHandler(LoginException.class)
 	public ResponseEntity<Response> loginException(Exception e) {
 
@@ -28,6 +31,8 @@ public class GlobalException {
 				new Response(UserUtility.HTTP_STATUS_UNAUTHORIZED_CLIENT, e.getMessage(), null),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	//----------------------------------------------------------------------------------------------//
 
 	@ExceptionHandler(RegistrationExcepton.class)
 	public ResponseEntity<Response> registrationExcepton(Exception e) {
@@ -36,6 +41,8 @@ public class GlobalException {
 				new Response(UserUtility.HTTP_STATUS_UNAUTHORIZED_CLIENT, e.getMessage(), null),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	//----------------------------------------------------------------------------------------------//
 
 	@ExceptionHandler(TokenException.class)
 	public ResponseEntity<Response> tokenException(Exception e) {
@@ -44,6 +51,8 @@ public class GlobalException {
 				new Response(UserUtility.HTTP_STATUS_UNAUTHORIZED_CLIENT, e.getMessage(), null),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	//----------------------------------------------------------------------------------------------//
 
 	@ExceptionHandler(ForgotpasswordException.class)
 	public ResponseEntity<Response> forgotPasswordException(Exception e) {
@@ -53,6 +62,8 @@ public class GlobalException {
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	//----------------------------------------------------------------------------------------------//
+	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Response> methodArgumentNotValidException(MethodArgumentNotValidException e){
 
@@ -60,5 +71,7 @@ public class GlobalException {
 				new Response(UserUtility.HTTP_STATUS_UNAUTHORIZED_CLIENT, "Email not proper", null),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	//----------------------------------------------------------------------------------------------//
 
 }

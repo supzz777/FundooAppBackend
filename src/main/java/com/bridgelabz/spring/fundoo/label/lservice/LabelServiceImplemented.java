@@ -7,6 +7,8 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.spring.fundoo.label.ldto.LabelDto;
@@ -14,15 +16,17 @@ import com.bridgelabz.spring.fundoo.label.lmodel.LabelModel;
 import com.bridgelabz.spring.fundoo.label.lrepository.LabelRepository;
 import com.bridgelabz.spring.fundoo.label.lutility.LabelUtility;
 import com.bridgelabz.spring.fundoo.notes.nexception.custom.IdNotFoundException;
+import com.bridgelabz.spring.fundoo.notes.nexception.custom.InputException;
 import com.bridgelabz.spring.fundoo.notes.nexception.custom.InvalidUserException;
+import com.bridgelabz.spring.fundoo.notes.nutitlity.NoteUtility;
 import com.bridgelabz.spring.fundoo.user.model.User;
 import com.bridgelabz.spring.fundoo.user.repository.UserRepository;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
 
 
-
 @Service
+@PropertySource("message.properties")
 public class LabelServiceImplemented implements ILabelService {
 	@Autowired
 	private LabelRepository lrepository;
@@ -32,15 +36,25 @@ public class LabelServiceImplemented implements ILabelService {
 
 	@Autowired
 	TokenUtility tokenUtility;
-
+	
 	@Autowired
 	private UserRepository repository;
+	
+	@Autowired
+	Environment environment;
+
 
 	// ------------------------------------------------------------------------------------------------//
 		
 		//1--> service implemented for creating the label.
-		@Override
-		public Response createLabel(@Valid LabelDto labelDto, String token) {
+	@Override
+	public Response createLabel(@Valid LabelDto labelDto, String token)
+	{
+		if( labelDto.getLabelName().isEmpty() )
+		{
+			throw new InputException(NoteUtility.INPUT_NOT_FOUND);
+		}
+			
 		LabelModel label = mapper.map(labelDto, LabelModel.class);
 
 		String useremail = tokenUtility.decodeToken(token);
@@ -58,18 +72,25 @@ public class LabelServiceImplemented implements ILabelService {
 
 		label = lrepository.save(label);
 
-		return new Response(200, "label created", "saved successfully");
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+				 environment.getProperty("COLLABORATOR_ADDED") ,  environment.getProperty("SUCESS") );
 	}
 
 	// -----------------------------------------------------------------------------------------------//
 		
 		//2--> service implemented for updating the label.
 		@Override
-		public Response updateLabel(@Valid int labelId, LabelDto labelDto, String token) {
+		public Response updateLabel(@Valid int labelId, LabelDto labelDto, String token)
+		{
+			
+			if( labelDto.getLabelName().isEmpty() )
+			{
+				throw new InputException(NoteUtility.INPUT_NOT_FOUND);
+			}
 		// NoteModel note =mapper.map(noteDto, NoteModel.class);
 
-		String useremail = tokenUtility.decodeToken(token);
-		User user = repository.findByEmail(useremail);
+			String useremail = tokenUtility.decodeToken(token);
+			User user = repository.findByEmail(useremail);
 
 		if (user == null) {
 
@@ -90,7 +111,8 @@ public class LabelServiceImplemented implements ILabelService {
 
 		lrepository.save(labelupdate);
 
-		return new Response(200, "label updated", "updated successfully");
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+				 environment.getProperty("LABEL_UPDATED") ,  environment.getProperty("SUCESS") );
 
 	}
 
@@ -117,8 +139,8 @@ public class LabelServiceImplemented implements ILabelService {
 
 		lrepository.delete(label);
 
-		return new Response(200, "Label deleted", "deleted successfully");
-
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+				 environment.getProperty("LABEL_DELETED") ,  environment.getProperty("SUCESS") );
 	}
 
 	//--------------------------------------------------------------------------------------------------//

@@ -4,7 +4,6 @@ package com.bridgelabz.spring.fundoo.collaborator.cutility;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class CollaboratorMessageUtility 
 {

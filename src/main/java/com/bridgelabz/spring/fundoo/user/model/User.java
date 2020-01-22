@@ -45,7 +45,7 @@ public class User implements Serializable {
 	@NotNull
 	private boolean validate;
 
-	@OneToMany
+	@OneToMany(mappedBy = "user")
 	private List<NoteModel> notes;
 
 	/*

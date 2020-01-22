@@ -32,5 +32,16 @@ public class NGlobalException
 		return new ResponseEntity<Response>(new Response(NoteUtility.HTTP_STATUS_UNAUTHORIZED_CLIENT, e.getMessage(),
 				"user not found in the databse."), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	//------------------------------------------------------------------------------------------------//
+
+		@ExceptionHandler(com.bridgelabz.spring.fundoo.notes.nexception.custom.InputException.class)
+		public ResponseEntity<Response> InputException(Exception e) {
+
+			return new ResponseEntity<Response>(new Response(NoteUtility.HTTP_STATUS_BAD_REQUEST, e.getMessage(),
+					"incorrect or blank input/s."), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	//------------------------------------------------------------------------------------------------//
 
 }

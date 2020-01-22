@@ -7,10 +7,13 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.spring.fundoo.notes.ndto.NoteDto;
 import com.bridgelabz.spring.fundoo.notes.nexception.custom.IdNotFoundException;
+import com.bridgelabz.spring.fundoo.notes.nexception.custom.InputException;
 import com.bridgelabz.spring.fundoo.notes.nexception.custom.InvalidUserException;
 import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
 import com.bridgelabz.spring.fundoo.notes.nrepository.NoteRepository;
@@ -21,6 +24,7 @@ import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
 
 @Service
+@PropertySource("message.properties")
 public class NoteServiceImplemented implements INoteService {
 	@Autowired
 	private NoteRepository nrepository;
@@ -33,27 +37,39 @@ public class NoteServiceImplemented implements INoteService {
 
 	@Autowired
 	private UserRepository repository;
+	
+	@Autowired
+	Environment environment;
 
-	// -----------------------------------------------------------------------------------------------//
+	//--------------------------------------------------------------------------------------------------//
 	
 	//1 --> service implemented to create a note.
 	@Override
-	public Response createNote(@Valid NoteDto noteDto, String token) {
-
-		NoteModel note = mapper.map(noteDto, NoteModel.class);
-		String useremail = tokenUtility.decodeToken(token);
+	public Response createNote(@Valid NoteDto noteDto, String token) 
+	{	
 		
+		if( noteDto.getTitle().isEmpty() || noteDto.getDiscription().isEmpty() || ( noteDto.getTitle().isEmpty() && noteDto.getDiscription().isEmpty() ) )
+		{
+			throw new InputException(NoteUtility.INPUT_NOT_FOUND);
+		}
+	
+		NoteModel note = mapper.map(noteDto, NoteModel.class);
+	
+		String useremail = tokenUtility.decodeToken(token);
+	
 		User user = repository.findByEmail(useremail);
 	
 		if (user == null) {
-		
+			
 			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
 		}
 		
+		
 		note.setUser(user);
 		note = nrepository.save(note);
-		
-		return new Response(200, "note created", "saved successfully");
+	
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+				 environment.getProperty("NOTE_CREATED") ,  environment.getProperty("SUCESS") );
 	}
 
 	// -----------------------------------------------------------------------------------------------//
@@ -63,6 +79,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response updateNote(@Valid int id, NoteDto noteDto, String token) 
 	{
+		if( noteDto.getTitle().isEmpty() || noteDto.getDiscription().isEmpty() || ( noteDto.getTitle().isEmpty() && noteDto.getDiscription().isEmpty() ) )
+		{
+			throw new InputException(NoteUtility.INPUT_NOT_FOUND);
+		}
+		
 		NoteModel note =mapper.map(noteDto, NoteModel.class);
 
 		String useremail = tokenUtility.decodeToken(token);
@@ -89,7 +110,8 @@ public class NoteServiceImplemented implements INoteService {
 
 		nrepository.save(note);
 
-		return new Response(200, "note updated", "updated successfully");
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+				 environment.getProperty("NOTE_UPDATED") ,  environment.getProperty("SUCESS") );
 
 	}
 
@@ -98,6 +120,7 @@ public class NoteServiceImplemented implements INoteService {
 	//3 --> service implemented to delete a note.
 	@Override
 	public Response deleteNote(int id, String token) {
+
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -115,15 +138,16 @@ public class NoteServiceImplemented implements INoteService {
 
 		nrepository.delete(note);
 
-		return new Response(200, "note deleted", "deleted successfully");
-
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+				 environment.getProperty("NOTE_DELETED") ,  environment.getProperty("SUCESS") );
 	}
 
-	// -----------------------------------------------------------------------------------------------//
+	// ----------------------------------------------------------------------------------------------------//
 	
 	//4 --> service implemented to show all the notes.
 	@Override
-	public List<NoteModel> showAllNotes(String token) {
+	public List<NoteModel> showAllNotes(String token)
+	{
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -154,7 +178,8 @@ public class NoteServiceImplemented implements INoteService {
 	
 	//6 --> service implemented to sort all the notes by title.
 	@Override
-	public List<NoteModel> SortNotesByTitle(String token) {
+	public List<NoteModel> SortNotesByTitle(String token)
+	{
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -179,7 +204,8 @@ public class NoteServiceImplemented implements INoteService {
 	
 	//7 --> service implemented to sort all the notes by Description.
 	@Override
-	public List<NoteModel> sortByDescription(String token) {
+	public List<NoteModel> sortByDescription(String token)
+	{
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -201,7 +227,8 @@ public class NoteServiceImplemented implements INoteService {
 	
 	//8 --> service implemented to sort all the notes by Date.
 	@Override
-	public List<NoteModel> sortByDate(String token) {
+	public List<NoteModel> sortByDate(String token) 
+	{
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
