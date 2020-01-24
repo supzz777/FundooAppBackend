@@ -8,7 +8,8 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.bridgelabz.spring.fundoo")
 public class FundooBackendApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) 
+	{
 
 		SpringApplication.run(FundooBackendApplication.class, args);
 
