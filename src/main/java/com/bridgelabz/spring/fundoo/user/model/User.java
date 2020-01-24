@@ -21,7 +21,7 @@ import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
 		 * a database table.
 		 */
 
-@Table(name = "userDetails") /*
+ /*
 								 * The @Table annotation specifies the name of the database table to be used for
 								 * mapping.
 								 */
