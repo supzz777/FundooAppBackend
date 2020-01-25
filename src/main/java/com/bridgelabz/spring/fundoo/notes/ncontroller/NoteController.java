@@ -1,6 +1,8 @@
 package com.bridgelabz.spring.fundoo.notes.ncontroller;
 
 import javax.validation.Valid;
+
+import org.aspectj.weaver.Dump.INode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bridgelabz.spring.fundoo.notes.ndto.NoteDto;
+import com.bridgelabz.spring.fundoo.notes.nservice.INoteService;
 import com.bridgelabz.spring.fundoo.notes.nservice.NoteServiceImplemented;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 
@@ -21,7 +24,7 @@ import com.bridgelabz.spring.fundoo.user.response.Response;
 @RequestMapping(value = "/fundoo")
 public class NoteController {
 	@Autowired
-	NoteServiceImplemented noteServiceImplemented;
+	INoteService noteServiceImplemented;
 	
 	// ---------------------------------------------------------------------------------------------//
 	@GetMapping("/demoz")
@@ -33,12 +36,11 @@ public class NoteController {
 	
 	//1 --> mapping for creating the note
 	@PostMapping("/note/create")
-	public ResponseEntity<Response> createNote(@Valid @RequestBody NoteDto noteDto, @RequestHeader String token) {
+	public ResponseEntity<Response> createNote(@Valid @RequestBody NoteDto noteDto, @RequestHeader String token) throws Exception {
 
 		return new ResponseEntity<Response>(noteServiceImplemented.createNote(noteDto, token), HttpStatus.OK); // give
 
 	}
-
 	// ---------------------------------------------------------------------------------------------//
 
 	/*
@@ -122,5 +124,35 @@ public class NoteController {
 	}
 
 	// -------------------------------------------------------------------------------------------------------------//
+	
+	@PutMapping("/note/pinUnpin/{id}")
+	public ResponseEntity<Response> notePin(@Valid @PathVariable("id") int id,
+			@RequestHeader String token) {
 
+		return new ResponseEntity<Response>(noteServiceImplemented.notePin(id,token), HttpStatus.OK); // give
+
+	}
+	
+	//---------------------------------------------------------------------------------------------------//
+	
+	@PutMapping("/note/archiveUnarchive/{id}")
+	public ResponseEntity<Response> noteArchive(@Valid @PathVariable("id") int id,
+			@RequestHeader String token) {
+
+		return new ResponseEntity<Response>(noteServiceImplemented.noteArchive(id,token), HttpStatus.OK); // give
+
+	}
+	
+	//---------------------------------------------------------------------------------------------------//
+	
+	@PutMapping("/note/trashUntrash/{id}")
+	public ResponseEntity<Response> noteTrash(@Valid @PathVariable("id") int id,
+			@RequestHeader String token) {
+
+		return new ResponseEntity<Response>(noteServiceImplemented.noteTrash(id,token), HttpStatus.OK); // give
+
+	}
+	
+	//---------------------------------------------------------------------------------------------------//
+	
 }

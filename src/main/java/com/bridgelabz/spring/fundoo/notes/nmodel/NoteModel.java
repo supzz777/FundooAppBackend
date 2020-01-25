@@ -33,6 +33,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 		 * a database table.
 		 */
 
+
+
 @Table(name = "noteDetails") /*
 								 * The @Table annotation specifies the name of the database table to be used for
 								 * mapping.
@@ -66,14 +68,18 @@ public class NoteModel implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@UpdateTimestamp
 	private Date noteUpdateDate;
+	
+	private boolean archive;
+	
+	private boolean trash;
+	private boolean pin;
 
 	public NoteModel() {
 
 	}
-	
-	//constructor with feilds.
+
 	public NoteModel(int id, @NotNull String title, @NotNull String discription, User user, List<LabelModel> labels,
-			Date noteregistrationDate, Date noteUpdateDate) {
+			Date noteregistrationDate, Date noteUpdateDate, boolean archive, boolean trash, boolean pin) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -82,9 +88,11 @@ public class NoteModel implements Serializable {
 		this.labels = labels;
 		this.noteregistrationDate = noteregistrationDate;
 		this.noteUpdateDate = noteUpdateDate;
+		this.archive = archive;
+		this.trash = trash;
+		this.pin = pin;
 	}
-	
-	//getters and setters
+
 	public int getId() {
 		return id;
 	}
@@ -140,15 +148,38 @@ public class NoteModel implements Serializable {
 	public void setNoteUpdateDate(Date noteUpdateDate) {
 		this.noteUpdateDate = noteUpdateDate;
 	}
-	
-	
+
+	public boolean getArchive() {
+		return archive;
+	}
+
+	public void setArchive(boolean archive) {
+		this.archive = archive;
+	}
+
+	public boolean getTrash() {
+		return trash;
+	}
+
+	public void setTrash(boolean trash) {
+		this.trash = trash;
+	}
+
+	public boolean getPin() {
+		return pin;
+	}
+
+	public void setPin(boolean pin) {
+		this.pin = pin;
+	}
 
 	@Override
 	public String toString() {
 		return "NoteModel [id=" + id + ", title=" + title + ", discription=" + discription + ", user=" + user
 				+ ", labels=" + labels + ", noteregistrationDate=" + noteregistrationDate + ", noteUpdateDate="
-				+ noteUpdateDate + "]";
+				+ noteUpdateDate + ", archive=" + archive + ", trash=" + trash + ", pin=" + pin + "]";
 	}
-
+	
+	
 	
 }

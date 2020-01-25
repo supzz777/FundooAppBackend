@@ -4,14 +4,17 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.stereotype.Service;
+
 import com.bridgelabz.spring.fundoo.notes.ndto.NoteDto;
 import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 
+@Service
 public interface INoteService 
 {
 	
-	public Response createNote(@Valid NoteDto noteDto , String token );
+	public Response createNote(@Valid NoteDto noteDto , String token ) throws Exception ;
 	
 	public Response updateNote( @Valid int id , NoteDto notedto, String token);
 	
@@ -26,5 +29,11 @@ public interface INoteService
 	public List<NoteModel> sortByDescription(String token) ;
 	
 	public List<NoteModel> sortByDate(String token);
+	
+	public Response notePin(int id, String token) ;
+	
+	public Response noteArchive(int id, String token) ;
+	
+	public Response noteTrash(int id, String token) ;
 	
 }

@@ -131,8 +131,7 @@ public class UserServiceImplemented implements IUserService {
 		// finding the user details from the provided email id.
 		User user = repository.findByEmail(logindto.getEmail()); // find email present or not
 
-		// orinting user details.
-		System.out.println(user);
+	
 
 		// checking if user details are null.
 		if (user == null) {

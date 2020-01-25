@@ -56,7 +56,9 @@ public class LabelModel implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@UpdateTimestamp
 	private Date noteUpdateDate;
-
+	
+	
+	
 
 	public LabelModel() {
 
