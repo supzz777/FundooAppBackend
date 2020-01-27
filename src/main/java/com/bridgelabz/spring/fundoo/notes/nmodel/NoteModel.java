@@ -72,6 +72,7 @@ public class NoteModel implements Serializable {
 	private boolean archive;
 	
 	private boolean trash;
+	
 	private boolean pin;
 
 	public NoteModel() {

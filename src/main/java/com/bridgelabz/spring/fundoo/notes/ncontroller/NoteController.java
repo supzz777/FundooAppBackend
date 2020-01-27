@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.bridgelabz.spring.fundoo.elasticsearch.ElasticSearchImplemented;
 import com.bridgelabz.spring.fundoo.notes.ndto.NoteDto;
 import com.bridgelabz.spring.fundoo.notes.nservice.INoteService;
 import com.bridgelabz.spring.fundoo.notes.nservice.NoteServiceImplemented;
@@ -25,6 +27,9 @@ import com.bridgelabz.spring.fundoo.user.response.Response;
 public class NoteController {
 	@Autowired
 	INoteService noteServiceImplemented;
+	
+	@Autowired
+	ElasticSearchImplemented  elasticSearchImplemented;
 	
 	// ---------------------------------------------------------------------------------------------//
 	@GetMapping("/demoz")
@@ -104,6 +109,9 @@ public class NoteController {
 	}
 
 	// -------------------------------------------------------------------------------------------------------------//
+	
+	
+	
 	
 	//6 --> mapping for showing all the notes in the sorted form by Description.
 	@GetMapping("/note/sortNotesByDescription")

@@ -116,6 +116,7 @@ public class NoteServiceImplemented implements INoteService {
 		noteRepository.save(note);
 		
 		try {
+			//elastic search implementation saved 
 			elasticSerach.updateNote(note);
 		} catch (Exception e) {
 			
@@ -149,6 +150,13 @@ public class NoteServiceImplemented implements INoteService {
 		note.setUser(user);
 
 		noteRepository.delete(note);
+		
+		try {
+			elasticSerach.deleteNote(id);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
 				 environment.getProperty("NOTE_DELETED") ,  environment.getProperty("SUCESS") );
@@ -206,7 +214,8 @@ public class NoteServiceImplemented implements INoteService {
 
 		note = note.stream().sorted((note1, note2) -> note1.getTitle().compareTo(note2.getTitle()))
 				.collect(Collectors.toList());
-
+		
+		
 		// Arrays.parallelSort(note);
 
 		return note; // show all user details in mysql.
@@ -263,6 +272,7 @@ public class NoteServiceImplemented implements INoteService {
 
 	// ----------------------------------------------------------------------------------------------------------//
 	
+	//9 --> service implemented to pin or unpin  the note/notes
 	@Override
 	public Response notePin(int id, String token) 
 	{
@@ -297,6 +307,7 @@ public class NoteServiceImplemented implements INoteService {
 	
 	//---------------------------------------------------------------------------------------------//
 	
+	//10 --> service implemented to archive or unarchive  the note/notes
 	@Override
 	public Response noteArchive(int id, String token) 
 	{
@@ -331,6 +342,7 @@ public class NoteServiceImplemented implements INoteService {
 	
 	//---------------------------------------------------------------------------------------------//
 	
+	//11 --> service implemented to trash or untrash  the note/notes
 	@Override
 	public Response noteTrash(int id, String token) 
 	{
