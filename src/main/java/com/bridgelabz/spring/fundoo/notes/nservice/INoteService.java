@@ -1,5 +1,6 @@
 package com.bridgelabz.spring.fundoo.notes.nservice;
 
+import java.sql.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.bridgelabz.spring.fundoo.notes.ndto.NoteDto;
 import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
 import com.bridgelabz.spring.fundoo.user.response.Response;
-
 @Service
 public interface INoteService 
 {
@@ -18,7 +18,7 @@ public interface INoteService
 	
 	public Response updateNote( @Valid int id , NoteDto notedto, String token);
 	
-	public Response deleteNote(int id, String token);
+	public Response deleteNote(int id, String token) throws Exception;
 	
 	public List<NoteModel> showAllNotes(String token);
 	
@@ -35,5 +35,11 @@ public interface INoteService
 	public Response noteArchive(int id, String token) ;
 	
 	public Response noteTrash(int id, String token) ;
+
+	public Response addRemainder(@Valid int id, String token , Date date );
+
+	public Response updateRemainder(@Valid int id, String token , Date date) ;
+
+	public Response deleteRemainder(@Valid int id, String token);
 	
 }

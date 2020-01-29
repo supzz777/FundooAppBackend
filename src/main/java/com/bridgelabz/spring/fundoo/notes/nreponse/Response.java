@@ -13,6 +13,20 @@ public class Response implements Serializable {
 	public Response() {
 
 	}
+	
+	
+
+
+
+	public Response(int status, String message) {
+		super();
+		this.status = status;
+		this.message = message;
+	}
+
+
+
+
 
 	public Response(int status, String message, Object data) {
 		super();

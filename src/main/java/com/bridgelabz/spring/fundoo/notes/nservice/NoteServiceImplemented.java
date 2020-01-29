@@ -1,5 +1,7 @@
 package com.bridgelabz.spring.fundoo.notes.nservice;
 
+import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,7 +26,6 @@ import com.bridgelabz.spring.fundoo.user.model.User;
 import com.bridgelabz.spring.fundoo.user.repository.UserRepository;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
-
 @Service
 @PropertySource("message.properties")
 public class NoteServiceImplemented implements INoteService {
@@ -132,7 +133,7 @@ public class NoteServiceImplemented implements INoteService {
 	
 	//3 --> service implemented to delete a note.
 	@Override
-	public Response deleteNote(int id, String token) {
+	public Response deleteNote(int id, String token) throws Exception {
 
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
@@ -148,15 +149,16 @@ public class NoteServiceImplemented implements INoteService {
 
 		// NoteModel note = nrepository.findById(id);
 		note.setUser(user);
-
-		noteRepository.delete(note);
 		
-		try {
-			elasticSerach.deleteNote(id);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if(note.getTrash()==true )
+		{
+		noteRepository.delete(note);
+		elasticSerach.deleteNote(id);
 		}
+		
+		
+			
+		
 
 		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
 				 environment.getProperty("NOTE_DELETED") ,  environment.getProperty("SUCESS") );
@@ -369,13 +371,99 @@ public class NoteServiceImplemented implements INoteService {
 					 environment.getProperty("NOTE_TRASH") ,  environment.getProperty("SUCESS") );
 		} else {
 			note.setTrash(true);
+			noteRepository.save(note);
+			
 			return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
 					 environment.getProperty("NOTE_UNTRASH") ,  environment.getProperty("SUCESS") );
 		}
 	}
 	
 	//---------------------------------------------------------------------------------------------//
+
+	//12 --> service implemented to set the remainder to  the note/notes
+	@Override
+	public Response addRemainder(@Valid int id, String token , Date date )
+	{
+		String useremail = tokenUtility.decodeToken(token);
+		User user = repository.findByEmail(useremail);
+
+		if (user == null) {
+
+			System.out.println("error exception thrown.");
+			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
+		}
+		
+		NoteModel note = noteRepository.findById(id)
+				.orElseThrow(() -> new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND));
+		
+		
+		note.setReminder(date);
+	//	note.setReminder(String.valueOf(LocalDateTime.now().plusDays(no_of_days)));
 	
+		//saving the note with the remainder set.
+		
+
+
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+				 environment.getProperty("NOTE_ADD_REMAINDER") );
+	}
+
+	//---------------------------------------------------------------------------------------------//
+	
+	//13 --> service implemented to update the remainder of  the note/notes
+	@Override
+	public Response updateRemainder(@Valid int id, String token , Date date) 
+	{
+		String useremail = tokenUtility.decodeToken(token);
+		User user = repository.findByEmail(useremail);
+
+		if (user == null) {
+
+			System.out.println("error exception thrown.");
+			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
+		}
+		
+		NoteModel note = noteRepository.findById(id)
+				.orElseThrow(() -> new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND));
+		
+		note.setReminder(date);
+		
+		noteRepository.save(note);
+		
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+		 environment.getProperty("NOTE_UPDATE_REMAINDER") );
+	}
+
+	//---------------------------------------------------------------------------------------------//
+	
+	//14 --> service implemented to delete the remainder of  the note/notes
+	@Override
+	public Response deleteRemainder(@Valid int id, String token)
+	{
+		String useremail = tokenUtility.decodeToken(token);
+		User user = repository.findByEmail(useremail);
+
+		if (user == null) {
+
+			System.out.println("error exception thrown.");
+			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
+		}
+		
+		NoteModel note = noteRepository.findById(id)
+				.orElseThrow(() -> new IdNotFoundException(NoteUtility.NOTE_NOT_FOUND));
+		
+
+		note.setReminder(null);
+		
+		noteRepository.save(note);
+		
+		
+		return new Response( Integer.parseInt( environment.getProperty("HTTP_STATUS_OK") ) , 
+		 environment.getProperty("NOTE_DELETE_REMAINDER") );
+	}
+	
+	//---------------------------------------------------------------------------------------------//
+
 	
 }
 

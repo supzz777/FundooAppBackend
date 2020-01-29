@@ -74,13 +74,16 @@ public class NoteModel implements Serializable {
 	private boolean trash;
 	
 	private boolean pin;
+	
+	private Date reminder;
 
 	public NoteModel() {
 
 	}
 
 	public NoteModel(int id, @NotNull String title, @NotNull String discription, User user, List<LabelModel> labels,
-			Date noteregistrationDate, Date noteUpdateDate, boolean archive, boolean trash, boolean pin) {
+			Date noteregistrationDate, Date noteUpdateDate, boolean archive, boolean trash, boolean pin,
+			Date reminder) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -92,6 +95,7 @@ public class NoteModel implements Serializable {
 		this.archive = archive;
 		this.trash = trash;
 		this.pin = pin;
+		this.reminder = reminder;
 	}
 
 	public int getId() {
@@ -115,6 +119,7 @@ public class NoteModel implements Serializable {
 	}
 
 	public void setDiscription(String discription) {
+		
 		this.discription = discription;
 	}
 
@@ -174,11 +179,20 @@ public class NoteModel implements Serializable {
 		this.pin = pin;
 	}
 
+	public Date getReminder() {
+		return reminder;
+	}
+
+	public void setReminder(Date reminder) {
+		this.reminder = reminder;
+	}
+
 	@Override
 	public String toString() {
 		return "NoteModel [id=" + id + ", title=" + title + ", discription=" + discription + ", user=" + user
 				+ ", labels=" + labels + ", noteregistrationDate=" + noteregistrationDate + ", noteUpdateDate="
-				+ noteUpdateDate + ", archive=" + archive + ", trash=" + trash + ", pin=" + pin + "]";
+				+ noteUpdateDate + ", archive=" + archive + ", trash=" + trash + ", pin=" + pin + ", reminder="
+				+ reminder + "]";
 	}
 	
 	

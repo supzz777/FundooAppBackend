@@ -37,12 +37,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class ElasticSearchImplemented implements IElasticSearchInterface
 {
-	
-	 @Autowired
+	/*it is a library.it is used above low level REST client.it accepts the request objects and returns the result 
+	 * in the form of response object. so request marshaling and response un marshaling is handled by client itself.*/
+	@Autowired
     private RestHighLevelClient client;
 
 	 @Autowired
-	 private ObjectMapper objectMapper;
+	 private ObjectMapper objectMapper; /*ObjectMapper provides functionality for
+ 										reading and writing JSON, either to and from  POJOs (Plain Old Java Objects)*/
 	 
 	 @Autowired
 	 NoteRepository noteRepository;
@@ -72,20 +74,21 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
 	    System.out.println("in elastic");
 	    
 	    @SuppressWarnings("unchecked")
-		Map<String, Object> documentMapper = 
-	 objectMapper.convertValue(note, Map.class);
-	
+		Map<String, Object> document = 
+		objectMapper.convertValue(note, Map.class);
+	    
+	    
+	    //.source() is used to map the object inside the index.
+	    
 	    IndexRequest indexRequest = new IndexRequest(INDEX, TYPE,
-	String.valueOf(note.getId()))
-	    .source(documentMapper); //.index(INDEX).type(TYPE);
+	    		String.valueOf(note.getId()))
+	    .source(document); //.index(INDEX).type(TYPE);
 	
-	    System.out.println("****"+indexRequest);
-	    System.out.println("after request");
+	    //making the response object
 	    IndexResponse indexResponse = client.index(indexRequest,
-	RequestOptions.DEFAULT);
+	    		RequestOptions.DEFAULT);
 	
-	    System.out.println("****"+indexResponse);
-	    System.out.println("note is :"+indexResponse.getResult().name());
+	    
 	    return indexResponse.getResult().name();
 	
 	}
@@ -94,22 +97,30 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
 	
      @Override
 	   public String updateNote(NoteModel note) throws Exception {
-
-		   NoteModel  resultDocument = noteRepository.findById(note.getId()).orElse(null);
+    	 
+    	 	//stores the note by id.
+		   NoteModel  document = noteRepository.findById(note.getId()).orElse(null);
 		   
-		   
+		   //for mapping the note object value inside the map
 	        @SuppressWarnings("unchecked")
 			Map<String, Object> documentMapper =
-	objectMapper.convertValue(note, Map.class);
-
+			objectMapper.convertValue(note, Map.class);
+	        
+	        //it stores the int id into the string value inside the map.
 	        UpdateRequest updateRequest = new UpdateRequest(INDEX, TYPE,
-	String.valueOf(resultDocument.getId()));
-
+	        		String.valueOf(document.getId()));
+	        
+	        /*Javadoc is a tool which comes with JDK and it is used for generating 
+	        Java code documentation in HTML/JSON format from Java source code, */
+	        //CONVERTS THE JAVA CODE INTO THE JSON FORMAT when script is not specified.
 	        updateRequest.doc(documentMapper);
-
+	        
+	        //simply stores the data in elastic search database.
+	        //RequestOptions.DEFAULT --> it is used to store the chnages without disturbing the natural behaviour of elastic search
 	        UpdateResponse updateResponse = client.update(updateRequest,
-	RequestOptions.DEFAULT);
-
+	        		RequestOptions.DEFAULT);
+	        
+	        //returns the result.
 	        return updateResponse.getResult().name();
 
 	    }
@@ -145,20 +156,26 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
  			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
  		}
 
-
+ 		//predefined  method for searching operation provided by elasticsearch.
          SearchRequest searchRequest = new SearchRequest();
          
+         	
+
+		/*	Most search parameters are added to the SearchSourceBuilder. 
+			It offers setters for everything that goes into the search request body. */
          SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-
+         //builds the query automatically and matches boolean combination of other queries.
          QueryBuilder queryBuilder =
         		 QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("title",
         				 "*"+title+"*"));
-
+         
+         
          searchSourceBuilder.query(queryBuilder);
 
          searchRequest.source(searchSourceBuilder);
-
+         
+         //making the response objects and returning it later.
          SearchResponse response = client.search(searchRequest,
         		 RequestOptions.DEFAULT);
          
@@ -182,15 +199,18 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
    			throw new InvalidUserException(NoteUtility.USER_NOT_FOUND);
    		}
 
-
+   			//getting the request from the user
          GetRequest getRequest = new GetRequest(INDEX, TYPE, Integer.toString(noteId) );
-
+         
+         //making the response object
          GetResponse getResponse = client.get(getRequest,
         		 RequestOptions.DEFAULT);
          
-         Map<String, Object> resultMap = getResponse.getSource();
+         //storing the response inside the map.s
+         Map<String, Object> responseMap = getResponse.getSource();
 
-         return objectMapper.convertValue(resultMap, NoteModel.class);
+         return objectMapper.convertValue(responseMap, NoteModel.class);
+        
 
      }
      
@@ -212,7 +232,9 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
          SearchRequest searchRequest = new SearchRequest();
          
          SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-
+         
+         //boolQuery() --> it is used to pass the restrictions on the search results.
+         //Querybuilder builts the query automatically.
          QueryBuilder queryBuilder =
 		 QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("discription",
 		 "*"+discription+"*"));
@@ -240,7 +262,9 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
 
          if (searchHit.length > 0) {
 
-         Arrays.stream(searchHit)
+         Arrays.stream(searchHit) 
+         
+         
          .forEach(hit ->
          note.add(objectMapper.convertValue(hit.getSourceAsMap(),
 		 NoteModel.class)));

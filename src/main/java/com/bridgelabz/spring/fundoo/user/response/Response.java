@@ -14,6 +14,16 @@ public class Response implements Serializable {
 
 	}
 	
+	
+	
+	public Response(int status, String message) {
+		super();
+		this.status = status;
+		this.message = message;
+	}
+
+
+
 	//constructor with feilds.
 	public Response(int status, String message, Object data) {
 		super();
@@ -22,6 +32,8 @@ public class Response implements Serializable {
 		this.data = data;
 	}
 	
+	
+
 	//getters and setters
 	public int getStatus() {
 		return status;
