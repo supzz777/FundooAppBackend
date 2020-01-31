@@ -3,6 +3,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<!-- The spring-boot-starter-parent dependency is the parent POM providing dependency and plugin management
+	 for Spring Boot-based applications. It contains the default versions of Java to use, the default versions of
+     dependencies that Spring Boot uses, and the default configuration of the Maven plugins. -->
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -18,31 +21,58 @@
 
 	<properties>
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
+	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	<java.version>1.8</java.version>
 	</properties>
 
 	<dependencies>
-
+		
+		<!-- Spring Data JPA handles most of the complexity of JDBC-based database access 
+		and ORM (Object Relational Mapping). It reduces the boilerplate code required by JPA.
+		 It makes the implementation of your persistence layer easier and faster. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		
+		<!-- Actuator is mainly used to expose operational information about the running application –
+		 health, metrics, info, dump, env, etc.Once this dependency is on the classpath several endpoints 
+		 are available for us out of the box. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+	
+	
+	<!--  2 dependencies for redis cache. -->	
+	 <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-starter-data-redis</artifactId>
+ 	 </dependency>
+	
+	<dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+    <type>jar</type>
+	</dependency>
 
+		<!-- It is used for building web applications using Spring Mobile. 
+		It is used for Java Bean Validation with Hibernate Validator. 
+		It is used to build a hypermedia-based RESTful web application with Spring MVC .
+		It is used to build RESTful web applications -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
+		
 		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 		</dependency>
-
+	
+		<!-- dependency for running the spring boot while coding. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -50,7 +80,7 @@
 			<optional>true</optional>
 		</dependency>
 		
-		
+		<!-- dependency for connecting with the mysql databse. -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -69,7 +99,7 @@
 			</exclusions>
 		</dependency>
 		
-		
+	<!--  2 dependencies for elastic search. -->	
 	<!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-high-level-client -->
 	<dependency>
     <groupId>org.elasticsearch.client</groupId>
@@ -83,17 +113,17 @@
  
 	
 	
-	
-<dependency>
-    <groupId>io.springfox</groupId>
-    <artifactId>springfox-swagger2</artifactId>
-    <version>2.9.2</version>
-</dependency>
-<dependency>
-    <groupId>io.springfox</groupId>
-    <artifactId>springfox-swagger-ui</artifactId>
-    <version>2.9.2</version>
-</dependency>
+	<!--  2 dependencies for swagger UI. -->	
+	<dependency>
+	    <groupId>io.springfox</groupId>
+	    <artifactId>springfox-swagger2</artifactId>
+	    <version>2.9.2</version>
+	</dependency>
+	<dependency>
+	    <groupId>io.springfox</groupId>
+	    <artifactId>springfox-swagger-ui</artifactId>
+	    <version>2.9.2</version>
+	</dependency>
 
 
 
@@ -103,8 +133,8 @@
 			<artifactId>spring-web</artifactId>
 		</dependency>
 
+		<!--  dependency for mapping the model class with DTO. -->	
 		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
-
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
