@@ -26,5 +26,7 @@ public interface IUserService {
 	public Response findBParticularUser(String token);
 	
 	public List<User> showAllUserz(String token);
+	
+	public Response logout(String token) ;
 
 }

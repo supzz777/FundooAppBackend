@@ -44,9 +44,13 @@ public class User implements Serializable {
 	private long phoneNumber;
 	@NotNull
 	private boolean validate;
+	
+	
 
 	@OneToMany(mappedBy = "user")
 	private List<NoteModel> notes;
+	
+	private boolean login; //1 for login 0 for logout
 
 	/*
 	 * @OneToMany private List<LabelModel> labels;
@@ -57,8 +61,11 @@ public class User implements Serializable {
 
 	}
 
+	
+
 	public User(int id, @NotNull String firstName, @NotNull String lastName, @NotNull String email,
-			@NotNull String password, @NotNull long phoneNumber, @NotNull boolean validate, List<NoteModel> notes) {
+			@NotNull String password, @NotNull long phoneNumber, @NotNull boolean validate, List<NoteModel> notes,
+			boolean login) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -68,7 +75,10 @@ public class User implements Serializable {
 		this.phoneNumber = phoneNumber;
 		this.validate = validate;
 		this.notes = notes;
+		this.login = login;
 	}
+
+
 
 	// Class constructor with feilds.
 	public User(int id, @NotNull String firstName, @NotNull String lastName, @NotNull String email,
@@ -82,76 +92,123 @@ public class User implements Serializable {
 		this.validate = validate;
 	}
 
+
 	// getters and setters.
 	public int getId() {
 		return id;
 	}
 
+
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
+
 
 	public String getFirstName() {
 		return firstName;
 	}
 
+
+
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
+
+
 
 	public String getLastName() {
 		return lastName;
 	}
 
+
+
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
+
 
 	public String getEmail() {
 		return email;
 	}
 
+
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+
 
 	public String getPassword() {
 		return password;
 	}
 
+
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+
 
 	public long getPhoneNumber() {
 		return phoneNumber;
 	}
 
+
+
 	public void setPhoneNumber(long phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
+
+
 
 	public boolean isValidate() {
 		return validate;
 	}
 
+
+
 	public void setValidate(boolean validate) {
 		this.validate = validate;
 	}
+
+
 
 	public List<NoteModel> getNotes() {
 		return notes;
 	}
 
+
+
 	public void setNotes(List<NoteModel> notes) {
 		this.notes = notes;
 	}
+
+
+
+	public boolean isLogin() {
+		return login;
+	}
+
+
+
+	public void setLogin(boolean login) {
+		this.login = login;
+	}
+
+
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
 				+ ", password=" + password + ", phoneNumber=" + phoneNumber + ", validate=" + validate + ", notes="
-				+ notes + "]";
+				+ notes + ", login=" + login + "]";
 	}
 
+	
+	
 }

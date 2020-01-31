@@ -29,7 +29,7 @@ import com.bridgelabz.spring.fundoo.user.utility.UserUtility;
 public class UserServiceImplemented implements IUserService {
 
 	@Autowired
-	private UserRepository repository; // create object user repo
+	private UserRepository userRepository; // create object user repo
 
 	@Autowired
 	private JavaMailSender javaMailSender; // use JavaMailSender class
@@ -64,7 +64,7 @@ public class UserServiceImplemented implements IUserService {
 		// User user1 =repository.findByEmail(registrationDto.getEmail());
 
 		// if( user.getEmail().equals( registrationDto.getEmail() ) )
-		if (repository.findAll().stream().anyMatch(i -> i.getEmail().equals(registrationDto.getEmail()))) {
+		if (userRepository.findAll().stream().anyMatch(i -> i.getEmail().equals(registrationDto.getEmail()))) {
 			System.out.println(user.getEmail() + "*****************");
 			System.out.println(registrationDto.getEmail() + "in register");
 			throw new RegistrationExcepton(UserUtility.EMAIL_REGISTERED_ALREADY);
@@ -74,7 +74,7 @@ public class UserServiceImplemented implements IUserService {
 		user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
 
 		// password Strored inside the DB.
-		user = repository.save(user); // store user all detail in db
+		user = userRepository.save(user); // store user all detail in db
 
 		// if (user.getEmail() == null)
 		if (user.getEmail().isEmpty()) {
@@ -106,13 +106,13 @@ public class UserServiceImplemented implements IUserService {
 		}
 
 		// finding the user details in the DB, from the obtained email id of the user.
-		User user = repository.findByEmail(email);
+		User user = userRepository.findByEmail(email);
 
 		if (user != null) {
 			// if userid is found , set the validate to true
 			user.setValidate(true);
 			// save the changes in the DB also.
-			repository.save(user);
+			userRepository.save(user);
 			logger.info("user saved to database.");
 			return new Response(UserUtility.HTTP_STATUS_OK, "account verified ", UserUtility.EMAIL_VERFIED);
 		} else {
@@ -129,7 +129,7 @@ public class UserServiceImplemented implements IUserService {
 		@Override
 		public Response loginUser(LoginDto logindto) {
 		// finding the user details from the provided email id.
-		User user = repository.findByEmail(logindto.getEmail()); // find email present or not
+		User user = userRepository.findByEmail(logindto.getEmail()); // find email present or not
 
 	
 
@@ -152,6 +152,7 @@ public class UserServiceImplemented implements IUserService {
 					&& config.encoder().matches(logindto.getPassword()/* raw password entered inside the DTO. */,
 							user.getPassword()/* this is encoded password */ )) {
 				// encode the user
+				user.setLogin(true);
 				logger.info("Login successful");
 				return new Response(UserUtility.HTTP_STATUS_OK, UserUtility.LOGIN_SUCCESSFUL, token); // password
 
@@ -170,7 +171,7 @@ public class UserServiceImplemented implements IUserService {
 		// public Response forgetPassword(String email, String token)
 		public Response forgetPassword(ForgetPasswordDto fgdto) {
 		// Finding the user details from the provided email in DTO.
-		User user = repository.findByEmail(fgdto.getEmail());
+		User user = userRepository.findByEmail(fgdto.getEmail());
 
 		// printing the user details on console.
 		System.out.println(user);
@@ -205,7 +206,7 @@ public class UserServiceImplemented implements IUserService {
 		String userEmail = tokenutility.decodeToken(token);
 
 		// finding the user in the database with the help of itz emailid.
-		User updateuser = repository.findByEmail(userEmail);
+		User updateuser = userRepository.findByEmail(userEmail);
 
 		// if provided password and confirm password are entered equal by the user then
 		// enter inside the loop.
@@ -239,9 +240,9 @@ public class UserServiceImplemented implements IUserService {
 		@Override
 		public String updateuser(User user, String email) {
 	
-			User userupdate = repository.findByEmail(email);
+			User userupdate = userRepository.findByEmail(email);
 			userupdate = user;
-			repository.save(userupdate);
+			userRepository.save(userupdate);
 			return UserUtility.USER_UPDATED;
 		}
 
@@ -255,7 +256,7 @@ public class UserServiceImplemented implements IUserService {
 			throw new TokenException(UserUtility.INVALID_TOKEN);
 		}
 
-		return new Response(UserUtility.HTTP_STATUS_OK, "User Registrtion ", repository.findByEmail(useremail));
+		return new Response(UserUtility.HTTP_STATUS_OK, "User Registrtion ", userRepository.findByEmail(useremail));
 	}
 
 	// ----------------------------------------------------------------------------------------//
@@ -264,7 +265,45 @@ public class UserServiceImplemented implements IUserService {
 	@Override
 	public List<User> showAllUserz(String token) {
 		System.out.println("check");
-		return repository.findAll(); // show all user details in mysql.
+		return userRepository.findAll(); // show all user details in mysql.
+	}
+	
+	// ----------------------------------------------------------------------------------------//
+
+	//8 --> method to logout the  user
+	@Override
+	public Response logout(String token) 
+	{
+		String useremail = tokenutility.decodeToken(token);
+		
+		if (useremail.isEmpty()) {
+			throw new TokenException(UserUtility.INVALID_TOKEN);
+		}
+		
+		for(User user: userRepository.findAll())
+		{
+            if(user.getEmail().equals(useremail))
+            {
+                if(user.isLogin()) 
+                {
+                    user.setLogin(false);
+                    userRepository.save(user);
+                    token.equals(null);
+                    
+                    
+                    
+                }
+                else
+                {
+                	return new Response(UserUtility.HTTP_STATUS_BAD_REQUEST, "User please login first "," Login failed ");
+                }
+
+		
+		
+            }
+            
+		}
+		return new Response(UserUtility.HTTP_STATUS_OK, "User logged out ", " Login successful ");
 	}
 
 	// ------------------------------------------------------------------------------------------

@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ public class NoteServiceImplemented implements INoteService {
 	//--------------------------------------------------------------------------------------------------//
 	
 	//1 --> service implemented to create a note.
+	
 	@Override
 	public Response createNote(@Valid NoteDto noteDto, String token) throws Exception 
 	{	
