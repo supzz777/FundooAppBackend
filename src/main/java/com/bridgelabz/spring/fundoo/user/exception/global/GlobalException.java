@@ -11,7 +11,6 @@ import com.bridgelabz.spring.fundoo.user.exception.custom.RegistrationExcepton;
 import com.bridgelabz.spring.fundoo.user.exception.custom.TokenException;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.UserUtility;
-
 @ControllerAdvice /*@ControllerAdvice. @ControllerAdvice used for global error handling in the Spring MVC application.
 										It also has full control over the body of the response and the status code. */
 public class GlobalException 
@@ -69,6 +68,26 @@ public class GlobalException
 
 		return new ResponseEntity<Response>(
 				new Response(UserUtility.HTTP_STATUS_UNAUTHORIZED_CLIENT, "Email not proper", null),
+				HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	//----------------------------------------------------------------------------------------------//
+	
+	@ExceptionHandler(com.bridgelabz.spring.fundoo.user.exception.custom.TokenExpiredException.class)
+	public ResponseEntity<Response> TokenExpiredException(Exception e){
+
+		return new ResponseEntity<Response>(
+				new Response(UserUtility.HTTP_STATUS_BAD_REQUEST, "token expired", "please login to continue"),
+				HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	//----------------------------------------------------------------------------------------------//
+		
+	@ExceptionHandler(com.bridgelabz.spring.fundoo.user.exception.custom.ProfileNotSavedException.class)
+	public ResponseEntity<Response> ProfileNotSavedException(Exception e){
+
+		return new ResponseEntity<Response>(
+				new Response(UserUtility.HTTP_STATUS_BAD_REQUEST, "profile pic not uploaded ", "please ty again"),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	

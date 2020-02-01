@@ -19,7 +19,9 @@ import com.bridgelabz.spring.fundoo.notes.nexception.custom.IdNotFoundException;
 import com.bridgelabz.spring.fundoo.notes.nexception.custom.InputException;
 import com.bridgelabz.spring.fundoo.notes.nexception.custom.InvalidUserException;
 import com.bridgelabz.spring.fundoo.notes.nutitlity.NoteUtility;
+import com.bridgelabz.spring.fundoo.user.exception.custom.TokenExpiredException;
 import com.bridgelabz.spring.fundoo.user.model.User;
+import com.bridgelabz.spring.fundoo.user.repository.RedisRepositoryImplemented;
 import com.bridgelabz.spring.fundoo.user.repository.UserRepository;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
@@ -42,6 +44,9 @@ public class LabelServiceImplemented implements ILabelService {
 	
 	@Autowired
 	Environment environment;
+	
+	@Autowired
+    private RedisRepositoryImplemented redisRepository;
 
 
 	// ------------------------------------------------------------------------------------------------//
@@ -50,6 +55,11 @@ public class LabelServiceImplemented implements ILabelService {
 	@Override
 	public Response createLabel(@Valid LabelDto labelDto, String token)
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		if( labelDto.getLabelName().isEmpty() )
 		{
 			throw new InputException(NoteUtility.INPUT_NOT_FOUND);
@@ -82,6 +92,10 @@ public class LabelServiceImplemented implements ILabelService {
 		@Override
 		public Response updateLabel(@Valid int labelId, LabelDto labelDto, String token)
 		{
+			if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
 			
 			if( labelDto.getLabelName().isEmpty() )
 			{
@@ -121,7 +135,12 @@ public class LabelServiceImplemented implements ILabelService {
 		//3--> service implemented for deleting the label.
 		@Override
 		public Response deleteLabel(int id, String token) {
-
+			
+			if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
+			
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -148,6 +167,12 @@ public class LabelServiceImplemented implements ILabelService {
 		//4--> service implemented for showing all the labels of a particular user present in the databse..
 		@Override
 		public List<LabelModel> showAllLabels(String token) {
+			
+			if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
+			
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 

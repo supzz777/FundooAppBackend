@@ -42,7 +42,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-	
+		
+		<!--  Cloudinary dependency. -->
+		<dependency>
+		<groupId>com.cloudinary</groupId>
+		<artifactId>cloudinary-core</artifactId>
+		<version>1.2.2</version>
+		</dependency>
+		
+		
 	
 	<!--  2 dependencies for redis cache. -->	
 	 <dependency>

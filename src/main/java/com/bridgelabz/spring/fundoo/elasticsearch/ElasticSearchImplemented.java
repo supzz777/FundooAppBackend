@@ -29,7 +29,9 @@ import com.bridgelabz.spring.fundoo.notes.nexception.custom.InvalidUserException
 import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
 import com.bridgelabz.spring.fundoo.notes.nrepository.NoteRepository;
 import com.bridgelabz.spring.fundoo.notes.nutitlity.NoteUtility;
+import com.bridgelabz.spring.fundoo.user.exception.custom.TokenExpiredException;
 import com.bridgelabz.spring.fundoo.user.model.User;
+import com.bridgelabz.spring.fundoo.user.repository.RedisRepositoryImplemented;
 import com.bridgelabz.spring.fundoo.user.repository.UserRepository;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,6 +56,10 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
 	 
 	 @Autowired
 	 TokenUtility tokenUtility;
+	 
+	 @Autowired
+	  private RedisRepositoryImplemented redisRepository;
+
     
     @Autowired
     public ElasticSearchImplemented(RestHighLevelClient client, ObjectMapper objectMapper)
@@ -146,6 +152,10 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
      
      public List<NoteModel> searchByTitle(String token ,String title) throws Exception 
      {
+    	 if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
     	 
 	    String useremail = tokenUtility.decodeToken(token);
 		User user = userRepository.findByEmail(useremail);
@@ -190,6 +200,12 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
     
      public NoteModel searchById(String token, int noteId) throws Exception {
     	 
+    	 
+    	 if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
+    	 
     	 String useremail = tokenUtility.decodeToken(token);
   		User user = userRepository.findByEmail(useremail);
 
@@ -218,6 +234,11 @@ public class ElasticSearchImplemented implements IElasticSearchInterface
      //-------------------------------------------------------------------------------------------------//
      
      public List<NoteModel> searchByWord(String token ,String discription) throws Exception {
+    	 
+    	 if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
     	 
     	 String useremail = tokenUtility.decodeToken(token);
   		User user = userRepository.findByEmail(useremail);

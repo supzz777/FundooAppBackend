@@ -7,7 +7,7 @@ public class NoteUtility
 	public final static String NOTE_NOT_FOUND = "please enter the right id of the note.";
 	public final static String INVALID_INPUT = "Seems you have not entered the input data correctly or left it blank.";
 	public final static String INPUT_NOT_FOUND = "Input data .";
-
+	public final static String LOGIN_FIRST = "it seems you have already logged out.please login to continue." ;
 	
 	// Http Requests
 	public final static int HTTP_STATUS_OK = 200;

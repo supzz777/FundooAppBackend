@@ -1,6 +1,6 @@
 package com.bridgelabz.spring.fundoo.notes.nexception.custom;
 
-public class InputException extends RuntimeException 
+public  class InputException extends RuntimeException 
 {
 	private static final long serialVersionUID = 1L;
 	

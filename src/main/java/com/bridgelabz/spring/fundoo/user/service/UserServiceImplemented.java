@@ -1,6 +1,10 @@
 package com.bridgelabz.spring.fundoo.user.service;
 
+import java.io.File;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.LoggerFactory;
@@ -8,22 +12,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.bridgelabz.spring.fundoo.notes.nutitlity.NoteUtility;
 import com.bridgelabz.spring.fundoo.user.config.Passwordconfig;
 import com.bridgelabz.spring.fundoo.user.dto.ForgetPasswordDto;
 import com.bridgelabz.spring.fundoo.user.dto.LoginDto;
 import com.bridgelabz.spring.fundoo.user.dto.RegistrationDto;
 import com.bridgelabz.spring.fundoo.user.dto.SetPasswordDto;
 import com.bridgelabz.spring.fundoo.user.exception.custom.ForgotpasswordException;
+import com.bridgelabz.spring.fundoo.user.exception.custom.ProfileNotSavedException;
 import com.bridgelabz.spring.fundoo.user.exception.custom.RegistrationExcepton;
 import com.bridgelabz.spring.fundoo.user.exception.custom.TokenException;
+import com.bridgelabz.spring.fundoo.user.exception.custom.TokenExpiredException;
 import com.bridgelabz.spring.fundoo.user.exception.custom.ValidateuserException;
+import com.bridgelabz.spring.fundoo.user.model.RedisModel;
 import com.bridgelabz.spring.fundoo.user.model.User;
+import com.bridgelabz.spring.fundoo.user.repository.IRedisRepository;
+import com.bridgelabz.spring.fundoo.user.repository.RedisRepositoryImplemented;
 import com.bridgelabz.spring.fundoo.user.repository.UserRepository;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.MessageUtility;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
 import com.bridgelabz.spring.fundoo.user.utility.UserUtility;
-
+import com.cloudinary.*;
+import com.cloudinary.utils.ObjectUtils;
 
 @Service
 public class UserServiceImplemented implements IUserService {
@@ -31,6 +44,9 @@ public class UserServiceImplemented implements IUserService {
 	@Autowired
 	private UserRepository userRepository; // create object user repo
 
+    @Autowired 
+    private RedisRepositoryImplemented redisRepository;
+ 
 	@Autowired
 	private JavaMailSender javaMailSender; // use JavaMailSender class
 
@@ -132,28 +148,43 @@ public class UserServiceImplemented implements IUserService {
 		User user = userRepository.findByEmail(logindto.getEmail()); // find email present or not
 
 	
-
+		System.out.println("1");
 		// checking if user details are null.
 		if (user == null) {
+			System.out.println("2");
 			return new Response(UserUtility.HTTP_STATUS_NOT_FOUND, "User LOGIN Failed. ", UserUtility.INVALID_USER);
 
 		}
-
+		System.out.println("3");
 		// else generating the token using email of the user.
 		String token = tokenutility.createToken(user.getEmail());
-
+		System.out.println("4");
 		// if user is not validated in the DB.
 		if (!user.isValidate()) {
+			System.out.println("5");
 			new ValidateuserException(UserUtility.NOT_ACTIVE);
 		} else {
+			System.out.println("6");
 			// matches() method of PasswordEncoder interface matches the raw password
 			// entered by the user with the encoded password present in the DB.
 			if (user.getEmail().equals(logindto.getEmail())
 					&& config.encoder().matches(logindto.getPassword()/* raw password entered inside the DTO. */,
-							user.getPassword()/* this is encoded password */ )) {
+							user.getPassword()/* this is encoded password */ ))
+			{
+				System.out.println("7");
+				RedisModel redisModel = new RedisModel();
+				System.out.println("8");
+				redisModel.setEmail(user.getEmail());
+				redisModel.setToken(token);
+				redisModel.setLogin(LocalDateTime.now());
+				System.out.println(redisModel.toString());
+				redisRepository.save(redisModel);
 				// encode the user
+				System.out.println("10");
 				user.setLogin(true);
+				System.out.println("11");
 				logger.info("Login successful");
+				System.out.println("12");
 				return new Response(UserUtility.HTTP_STATUS_OK, UserUtility.LOGIN_SUCCESSFUL, token); // password
 
 			}
@@ -201,8 +232,15 @@ public class UserServiceImplemented implements IUserService {
 		//5 --> service implementation set new Password of the user
 		@Override
 		public Response setPassword(SetPasswordDto setPasswordDto, String token) {
+			
+			if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
+			
 		// extracting the email id of the user from the given token and storing it into
 		// a variable.
+			
 		String userEmail = tokenutility.decodeToken(token);
 
 		// finding the user in the database with the help of itz emailid.
@@ -251,6 +289,10 @@ public class UserServiceImplemented implements IUserService {
 	//6 --> find the particular user from the database with the given token.	
 	@Override
 	public Response findBParticularUser(String token) {
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
 		String useremail = tokenutility.decodeToken(token);
 		if (useremail.isEmpty()) {
 			throw new TokenException(UserUtility.INVALID_TOKEN);
@@ -264,6 +306,12 @@ public class UserServiceImplemented implements IUserService {
 	//7 --> find all the  users from the database 
 	@Override
 	public List<User> showAllUserz(String token) {
+		
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		System.out.println("check");
 		return userRepository.findAll(); // show all user details in mysql.
 	}
@@ -274,38 +322,80 @@ public class UserServiceImplemented implements IUserService {
 	@Override
 	public Response logout(String token) 
 	{
+		
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenutility.decodeToken(token);
 		
 		if (useremail.isEmpty()) {
 			throw new TokenException(UserUtility.INVALID_TOKEN);
 		}
-		
-		for(User user: userRepository.findAll())
+		else
 		{
-            if(user.getEmail().equals(useremail))
-            {
-                if(user.isLogin()) 
-                {
-                    user.setLogin(false);
-                    userRepository.save(user);
-                    token.equals(null);
-                    
-                    
-                    
-                }
-                else
-                {
-                	return new Response(UserUtility.HTTP_STATUS_BAD_REQUEST, "User please login first "," Login failed ");
-                }
-
-		
-		
-            }
-            
+			redisRepository.delete(token);
+			return new Response(UserUtility.HTTP_STATUS_OK, "User logged out ", " Logout successful ");
 		}
-		return new Response(UserUtility.HTTP_STATUS_OK, "User logged out ", " Login successful ");
-	}
-
-	// ------------------------------------------------------------------------------------------
+		
+	}	
+	// ---------------------------------------------------------------------------------------------------------//
 	
+
+		//9 --> method to upload the profile pic.
+		@Override
+		public Response uploadProfile(MultipartFile file, String token) 
+		{	System.out.println("1");
+			if(redisRepository.findUser(token)== null)
+			{	System.out.println("2");
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
+			System.out.println("3");
+			String useremail = tokenutility.decodeToken(token);
+			System.out.println("4");
+			User user = userRepository.findByEmail(useremail);
+			System.out.println("5");
+			if (useremail.isEmpty()) {
+				System.out.println("6");
+				throw new TokenException(UserUtility.INVALID_TOKEN);
+			}
+			System.out.println("7");
+			File fileobj = new File(file.getOriginalFilename()); // get file name from file object(Multipart file)
+			System.out.println("8");
+//			Map<String, String> map = new HashMap<>();
+//			map.put("cloud_name", "dm7gxgahq"); // create map objec and set cloud name,api key, api secret key
+//			map.put("api_key", "493727798585473");
+//			map.put("api_secret", "gCKnTn3HPZxyDHUJA6yuSX5BY6Y");
+			Map map = ObjectUtils.asMap(
+					  "cloud_name", "dm7gxgahq",
+					  "api_key", "493727798585473",
+					  "api_secret", "gCKnTn3HPZxyDHUJA6yuSX5BY6Y");
+			
+			System.out.println("9");
+			Cloudinary cloudinary = new Cloudinary(map); // set map object in cloudinary constructor
+			System.out.println("10");
+			Map<?, ?> uploadedResult = null;
+			System.out.println("11");
+			try {
+				System.out.println("12");
+			uploadedResult = cloudinary.uploader().upload(fileobj, ObjectUtils.emptyMap());
+			} catch (Exception e) {
+				System.out.println("13");
+			throw new ProfileNotSavedException(UserUtility.PROFILE_PIC_NOT_UPLOADED);
+			}
+		
+			System.out.println("14");
+			user.setProfilePic(uploadedResult.get("secure_url").toString()); // get secure url from uploaded result and
+			// set
+			// into user object
+			System.out.println("15");
+			userRepository.save(user);
+			System.out.println("16");
+			return new Response(UserUtility.HTTP_STATUS_OK, "PROFILE_SAVE_SUCCESSFULLY ", null);
+
+				//cloudinary.uploader.destroy('zombie', function(result) { console.log(result) });
+		}
+	// ------------------------------------------------------------------------------------------
+		
 }

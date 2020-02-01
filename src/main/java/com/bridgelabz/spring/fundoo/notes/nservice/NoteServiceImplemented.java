@@ -1,16 +1,13 @@
 package com.bridgelabz.spring.fundoo.notes.nservice;
 
 import java.sql.Date;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -23,13 +20,21 @@ import com.bridgelabz.spring.fundoo.notes.nexception.custom.InvalidUserException
 import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
 import com.bridgelabz.spring.fundoo.notes.nrepository.NoteRepository;
 import com.bridgelabz.spring.fundoo.notes.nutitlity.NoteUtility;
+import com.bridgelabz.spring.fundoo.user.exception.custom.TokenExpiredException;
+import com.bridgelabz.spring.fundoo.user.model.RedisModel;
 import com.bridgelabz.spring.fundoo.user.model.User;
+import com.bridgelabz.spring.fundoo.user.repository.IRedisRepository;
+import com.bridgelabz.spring.fundoo.user.repository.RedisRepositoryImplemented;
 import com.bridgelabz.spring.fundoo.user.repository.UserRepository;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
+
+
 @Service
 @PropertySource("message.properties")
-public class NoteServiceImplemented implements INoteService {
+public class NoteServiceImplemented implements INoteService 
+{
+	
 	@Autowired
 	private NoteRepository noteRepository;
 
@@ -44,8 +49,13 @@ public class NoteServiceImplemented implements INoteService {
 	
 	@Autowired
 	Environment environment;
+	
 	@Autowired
 	ElasticSearchImplemented elasticSerach;
+	
+   @Autowired 
+   RedisRepositoryImplemented redisRepository;
+	 
 
 	//--------------------------------------------------------------------------------------------------//
 	
@@ -54,12 +64,17 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response createNote(@Valid NoteDto noteDto, String token) throws Exception 
 	{	
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
 		
 		if( noteDto.getTitle().isEmpty() || noteDto.getDiscription().isEmpty() || ( noteDto.getTitle().isEmpty() && noteDto.getDiscription().isEmpty() ) )
 		{
 			throw new InputException(NoteUtility.INPUT_NOT_FOUND);
 		}
 	
+		
 		NoteModel note = mapper.map(noteDto, NoteModel.class);
 	
 		String useremail = tokenUtility.decodeToken(token);
@@ -87,6 +102,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response updateNote(@Valid int id, NoteDto noteDto, String token) 
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		if( noteDto.getTitle().isEmpty() || noteDto.getDiscription().isEmpty() || ( noteDto.getTitle().isEmpty() && noteDto.getDiscription().isEmpty() ) )
 		{
 			throw new InputException(NoteUtility.INPUT_NOT_FOUND);
@@ -136,7 +156,12 @@ public class NoteServiceImplemented implements INoteService {
 	//3 --> service implemented to delete a note.
 	@Override
 	public Response deleteNote(int id, String token) throws Exception {
-
+		
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -172,6 +197,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public List<NoteModel> showAllNotes(String token)
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -204,6 +234,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public List<NoteModel> SortNotesByTitle(String token)
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -230,7 +265,12 @@ public class NoteServiceImplemented implements INoteService {
 	//7 --> service implemented to sort all the notes by Description.
 	@Override
 	public List<NoteModel> sortByDescription(String token)
-	{
+	{	
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -253,7 +293,12 @@ public class NoteServiceImplemented implements INoteService {
 	//8 --> service implemented to sort all the notes by Date.
 	@Override
 	public List<NoteModel> sortByDate(String token) 
-	{
+	{	
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -280,7 +325,10 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response notePin(int id, String token) 
 	{
-		
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
 
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
@@ -315,8 +363,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response noteArchive(int id, String token) 
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
 		
-
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -350,7 +401,10 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response noteTrash(int id, String token) 
 	{
-		
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
 
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
@@ -386,6 +440,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response addRemainder(@Valid int id, String token , Date date )
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -416,6 +475,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response updateRemainder(@Valid int id, String token , Date date) 
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 
@@ -442,6 +506,11 @@ public class NoteServiceImplemented implements INoteService {
 	@Override
 	public Response deleteRemainder(@Valid int id, String token)
 	{
+		if(redisRepository.findUser(token)== null)
+		{
+			throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+		}
+		
 		String useremail = tokenUtility.decodeToken(token);
 		User user = repository.findByEmail(useremail);
 

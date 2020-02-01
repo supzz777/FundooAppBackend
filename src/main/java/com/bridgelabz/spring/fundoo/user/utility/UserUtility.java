@@ -21,6 +21,7 @@ public class UserUtility {
 	public final static String IMAGE_FORMAT_EXCEPTION = "Please upload proper image";
 	public final static String IMAGE_UPDATE_FAILED = "Please upload pic first to update pic";
 	public final static String GET_USER = "User details";
+	public final static String PROFILE_PIC_NOT_UPLOADED ="your profile pic has not been uploaded , please try again.";
 
 	// token key
 	public final static String KEY_LOGIN = "loginkey";

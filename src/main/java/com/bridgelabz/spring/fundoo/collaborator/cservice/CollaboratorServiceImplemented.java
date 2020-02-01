@@ -18,6 +18,8 @@ import com.bridgelabz.spring.fundoo.notes.nexception.custom.InvalidUserException
 import com.bridgelabz.spring.fundoo.notes.nmodel.NoteModel;
 import com.bridgelabz.spring.fundoo.notes.nrepository.NoteRepository;
 import com.bridgelabz.spring.fundoo.notes.nutitlity.NoteUtility;
+import com.bridgelabz.spring.fundoo.user.exception.custom.TokenExpiredException;
+import com.bridgelabz.spring.fundoo.user.repository.RedisRepositoryImplemented;
 import com.bridgelabz.spring.fundoo.user.response.Response;
 import com.bridgelabz.spring.fundoo.user.utility.TokenUtility;
 
@@ -42,12 +44,21 @@ public class CollaboratorServiceImplemented implements ICollaboratorService {
 
 	@Autowired
 	Environment environment;
+	
+	@Autowired
+	RedisRepositoryImplemented redisRepository;
 
 	// --------------------------------------------------------------------------------------------//
 
 	// 1 --> service implemented to collaborate a note.
 	@Override
 	public Response Collaborate(CollaboratorDto collaboratorDto, String token) {
+		
+		 if(redisRepository.findUser(token)== null)
+			{
+				throw new TokenExpiredException(NoteUtility.LOGIN_FIRST);
+			}
+		 
 		if (collaboratorDto.getNoteID() == 0 || collaboratorDto.getReceiver_mail().isEmpty()
 				|| (collaboratorDto.getNoteID() == 0 && collaboratorDto.getReceiver_mail().isEmpty())) {
 			throw new InputException(NoteUtility.INPUT_NOT_FOUND);

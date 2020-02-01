@@ -46,11 +46,15 @@ public class User implements Serializable {
 	private boolean validate;
 	
 	
+	
+	
 
 	@OneToMany(mappedBy = "user")
 	private List<NoteModel> notes;
 	
 	private boolean login; //1 for login 0 for logout
+	
+	private String profilePic;
 
 	/*
 	 * @OneToMany private List<LabelModel> labels;
@@ -62,10 +66,9 @@ public class User implements Serializable {
 	}
 
 	
-
 	public User(int id, @NotNull String firstName, @NotNull String lastName, @NotNull String email,
 			@NotNull String password, @NotNull long phoneNumber, @NotNull boolean validate, List<NoteModel> notes,
-			boolean login) {
+			boolean login, String profilePic) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -76,9 +79,8 @@ public class User implements Serializable {
 		this.validate = validate;
 		this.notes = notes;
 		this.login = login;
+		this.profilePic = profilePic;
 	}
-
-
 
 	// Class constructor with feilds.
 	public User(int id, @NotNull String firstName, @NotNull String lastName, @NotNull String email,
@@ -93,11 +95,9 @@ public class User implements Serializable {
 	}
 
 
-	// getters and setters.
 	public int getId() {
 		return id;
 	}
-
 
 
 	public void setId(int id) {
@@ -105,11 +105,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public String getFirstName() {
 		return firstName;
 	}
-
 
 
 	public void setFirstName(String firstName) {
@@ -117,11 +115,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public String getLastName() {
 		return lastName;
 	}
-
 
 
 	public void setLastName(String lastName) {
@@ -129,11 +125,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public String getEmail() {
 		return email;
 	}
-
 
 
 	public void setEmail(String email) {
@@ -141,11 +135,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public String getPassword() {
 		return password;
 	}
-
 
 
 	public void setPassword(String password) {
@@ -153,11 +145,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public long getPhoneNumber() {
 		return phoneNumber;
 	}
-
 
 
 	public void setPhoneNumber(long phoneNumber) {
@@ -165,11 +155,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public boolean isValidate() {
 		return validate;
 	}
-
 
 
 	public void setValidate(boolean validate) {
@@ -177,11 +165,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public List<NoteModel> getNotes() {
 		return notes;
 	}
-
 
 
 	public void setNotes(List<NoteModel> notes) {
@@ -189,11 +175,9 @@ public class User implements Serializable {
 	}
 
 
-
 	public boolean isLogin() {
 		return login;
 	}
-
 
 
 	public void setLogin(boolean login) {
@@ -201,13 +185,23 @@ public class User implements Serializable {
 	}
 
 
+	public String getProfilePic() {
+		return profilePic;
+	}
+
+
+	public void setProfilePic(String profilePic) {
+		this.profilePic = profilePic;
+	}
+
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
 				+ ", password=" + password + ", phoneNumber=" + phoneNumber + ", validate=" + validate + ", notes="
-				+ notes + ", login=" + login + "]";
+				+ notes + ", login=" + login + ", profilePic=" + profilePic + "]";
 	}
+
 
 	
 	

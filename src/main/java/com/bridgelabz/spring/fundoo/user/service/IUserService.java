@@ -2,6 +2,8 @@ package com.bridgelabz.spring.fundoo.user.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.bridgelabz.spring.fundoo.user.dto.ForgetPasswordDto;
 import com.bridgelabz.spring.fundoo.user.dto.LoginDto;
 import com.bridgelabz.spring.fundoo.user.dto.RegistrationDto;
@@ -28,5 +30,7 @@ public interface IUserService {
 	public List<User> showAllUserz(String token);
 	
 	public Response logout(String token) ;
+	
+	public Response uploadProfile(MultipartFile file, String token) ;
 
 }
